@@ -22,7 +22,7 @@ def main(args):
 	for eachresource in resourceTypes:
 	    print("Generating schema for : {0}".format(eachresource))
 	    awsschema = AWSbuildSchema(eachresource, definitions['definitions'], parameter.config, '', {})
-	    with open(parameter.schema_path + eachresource +'.txt', 'w') as outfile:
+	    with open(os.getcwd() + "/schema/" + eachresource +'.txt', 'w') as outfile:
 	        outfile.write(str(awsschema))
 
 

@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#folder_loc= "/home/ubuntu/code/a3/etl"
-folder_loc= "/Users/binmao/Documents/bulkdata_analytics/ETL_combined"
 
 
 extensions=[
@@ -29,7 +27,5 @@ config = {
         'includeAA': True
 	}
 
-schema_path = "/Users/binmao/Documents/aws/schema/"
-#schema_path = "/home/ubuntu/code/schema/generatedschema/"
 
 
