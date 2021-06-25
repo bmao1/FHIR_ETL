@@ -90,19 +90,22 @@ def transformReference(value, baseUrl, containedResources, definitions, schemaCo
     if "reference" not in value:
         return value
     
-    elif value["reference"][0] == "#":
-        if  value["reference"] != "#":
-            for res in containedResources:
-                if res["id_prev_aa"].split("#")[-1] == value["reference"][1:]:
-                    resource = res
-        else :
-            resource = parentResource
-        return {**value,
-            "reference": "{0}/{1}".format(resource["resourceType"],resource["id"]),
-            "reference_id_aa": resource["id"],
-            "reference_prev_aa": value["reference"],
-            "type": resource["resourceType"]
-            }
+    if value["reference"][0] == "#":
+        try:
+            if  value["reference"] != "#":
+                for res in containedResources:
+                    if res["id_prev_aa"].split("#")[-1] == value["reference"][1:]:
+                        resource = res
+            else :
+                resource = parentResource
+            return {**value,
+                "reference": "{0}/{1}".format(resource["resourceType"],resource["id"]),
+                "reference_id_aa": resource["id"],
+                "reference_prev_aa": value["reference"],
+                "type": resource["resourceType"]
+                }
+        except:
+            pass
 
     if value["reference"].startswith("http:") or value["reference"].startswith("https:"):
         url = value["reference"]
@@ -241,7 +244,7 @@ def walkElement(element, definitions, path=[], baseUrl="", schemaConfig={}, full
             #only allow pre-defined value types in extension
             if path[0]=="Extension" and not any(x.find(fullPath) > -1 for x in schemaConfig['includeExtensions']):
             #if path[0]=="Extension" and not any(x.find(fullPath) > -1 for x in schemaConfig['includeExtensions']):
-                print("Schema not found not found for {0}".format(elemFullPath))
+                #print("Schema not found not found for {0}".format(elemFullPath))
                 continue
             
             #don't allow extensions in complex elements in extensions

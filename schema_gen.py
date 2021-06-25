@@ -2,7 +2,7 @@ import sys
 import parameter
 from schema_func import AWSbuildSchema
 from annotation_func import buildBundle
-
+import os
 
 
 
@@ -15,8 +15,8 @@ def main(args):
 	    resourceTypes =[]
 
 
-	resourceDefinitions = buildBundle(parameter.folder_loc + '/fhir/R4.0.1/profiles-resources.json')
-	typeDefinitions = buildBundle(parameter.folder_loc + '/fhir/R4.0.1/profiles-types.json')
+	resourceDefinitions = buildBundle(os.getcwd() + '/fhir/R4.0.1/profiles-resources.json')
+	typeDefinitions = buildBundle(os.getcwd() + '/fhir/R4.0.1/profiles-types.json')
 	definitions = {"definitions": {**resourceDefinitions['definitions'], **typeDefinitions['definitions']}, "resourceNames": resourceDefinitions['resourceNames']}
 
 	for eachresource in resourceTypes:

@@ -4,10 +4,7 @@ import sys
 import json
 from annotation_func import *
 import parameter
-
-#sem_type_list =['DiseaseDisorderMention','SignSymptomMention','MedicationMention','ProcedureMention']
-#resource_map={'DiseaseDisorderMention':'Condition', 'SignSymptomMention':'Observation', 'MedicationMention':'MedicationStatement','ProcedureMention':'Procedure'}
-
+import os
 
 
 def main(args):
@@ -18,8 +15,8 @@ def main(args):
     inputdir= args[0]
     outputdir= args[1]
     
-    resourceDefinitions = buildBundle(parameter.folder_loc + '/fhir/R4.0.1/profiles-resources.json')
-    typeDefinitions = buildBundle(parameter.folder_loc + '/fhir/R4.0.1/profiles-types.json')
+    resourceDefinitions = buildBundle(os.getcwd() + '/fhir/R4.0.1/profiles-resources.json')
+    typeDefinitions = buildBundle(os.getcwd() + '/fhir/R4.0.1/profiles-types.json')
     definitions = {"definitions": {**resourceDefinitions['definitions'], **typeDefinitions['definitions']}, "resourceNames": resourceDefinitions['resourceNames']}
     
 
