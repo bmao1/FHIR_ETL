@@ -34,10 +34,11 @@ def main(args):
 
     for filename in glob(trimUrl(inputdir) + '/*.ndjson'):
         with open(filename) as f:
-            resourcename = filename[:-7].split("/")[-1]
+            # resourcename = filename[:-7].split("/")[-1]
             content = f.readlines()
             for line in content:
                 lineContent = json.loads(line)
+                resourcename = lineContent["resourceType"]
                 if "contained" in lineContent:
                     for cont_res in lineContent["contained"]:
                         result = transformResource(cont_res, definitions["definitions"], "", "", {"includeExtensions": parameter.extensions})
