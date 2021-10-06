@@ -43,7 +43,7 @@ def main(args):
                     for cont_res in lineContent["contained"]:
                         result = transformResource(cont_res, definitions["definitions"], "", "", {"includeExtensions": parameter.extensions})
                         with open(trimUrl(outputdir) + '/' + cont_res["resourceType"] + '.ndjson', 'a') as outfile:
-                            outfile.write(str(result))
+                            outfile.write(json.dumps(result))
                             outfile.write('\n') 
                     #remove contained contents after processing
                     del lineContent["contained"]
@@ -51,7 +51,7 @@ def main(args):
                 #process the resource
                 result = transformResource(lineContent, definitions["definitions"], "", "", {"includeExtensions": parameter.extensions})
                 with open(trimUrl(outputdir) + '/' + resourcename + '.ndjson', 'a') as outfile:
-                    outfile.write(str(result))
+                    outfile.write(json.dumps(result))
                     outfile.write('\n')                
                         
 
