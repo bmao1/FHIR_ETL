@@ -23,7 +23,7 @@ def main(args):
 	    print("Generating schema for : {0}".format(eachresource))
 	    schema = sparkBuildSchema(eachresource, definitions['definitions'], parameter.config, '', {})
 	    schema = "StructType([{}])".format(schema)
-	    with open(os.getcwd() + "/schema/delta_" + eachresource +'.txt', 'w') as outfile:
+	    with open(os.getcwd() + "/schema/delta_" + eachresource.lower() +'.txt', 'w') as outfile:
 	        outfile.write(str(schema))
 
 

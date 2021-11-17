@@ -9,7 +9,7 @@ from delta import *
 from delta.tables import *
 from glob import glob
 from pyspark.sql.functions import *
-import time 
+from time import time
 import re
 import boto3
 import numpy as np
@@ -50,7 +50,7 @@ def ndjson_to_delta(filepath, deltapath):
     resource = deltapath.split("/")[-1].split(".")[0]
     #look for delta schema i n./schema/delta_*
     try:
-        with open(os.getcwd()+ "/schema/delta_" + resource + ".txt") as f:
+        with open(os.getcwd()+ "/schema/delta_" + resource.lower() + ".txt") as f:
             schema = f.read()
             schema = eval(schema)
             print("Schema is found in {}".format(os.getcwd()+ "/schema/delta_" + resource.lower() + ".txt"))
@@ -68,25 +68,27 @@ def ndjson_to_delta(filepath, deltapath):
 
     # will the data contains multiple version of the same resource?
     print("Reading file " + filepath)
-    updatesDF = spark.read.json(filepath,schema).dropDuplicates(["id"])
+    updatesDF = spark.read.json(filepath,schema).dropDuplicates(["id"]).fillna("")
     # try load delta table
     deltapath= deltapath.lower()
     try:
         deltaTable = DeltaTable.forPath(spark, deltapath)
         merge = 1
     except:
+        merge = 0
         print("Can not verified existing delta table in {}".format(deltapath))
 
-    if merge =1:
+    if merge ==1:
         print("Merging into delta table in " + deltapath)
         ts = time()
         deltaTable.alias("delta").merge( \
             source = updatesDF.alias("updates"), \
-            condition = "delta.id = updates.id") \
+            condition = "delta.id <=> updates.id") \
             .whenMatchedUpdateAll() \
             .whenNotMatchedInsertAll() \
             .execute()
-        print("Merge took {:0.1f}s. File {1} is merged into delta in {2}".format(time()-ts, filepath,deltapath))
+        print("File {0} is merged into delta in {1}".format(filepath,deltapath))
+        print("Merge took {:0.1f}s.".format(time()-ts))
     else:
         print("Creating new delta table in " + deltapath)
         updatesDF.write.option("overwriteSchema", "true").format("delta").mode("overwrite").save(deltapath)
@@ -268,7 +270,7 @@ def athena_delta_from_schema(athena_tb, schema, s3_data_input, logpath, athena_d
         ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
         STORED AS INPUTFORMAT 'org.apache.hadoop.hive.ql.io.SymlinkTextInputFormat'
         OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'
-        LOCATION '{3}/{1}/_symlink_format_manifest/';
+        LOCATION '{3}{1}/_symlink_format_manifest/';
         '''.format(athena_db.lower(), athena_tb.lower(), schema, s3_data_input)
         
     print(query)
@@ -277,9 +279,20 @@ def athena_delta_from_schema(athena_tb, schema, s3_data_input, logpath, athena_d
     
 
 def schema_from_file(resource):
-    with open(os.getcwd()+ "/schema/delta_" + resource.lower() + ".txt") as f:
-        schema = f.read()
-    return schema
+    try: 
+        with open(os.getcwd()+ "/schema/" + resource.lower() + ".txt") as f:
+            schema = f.read()
+    except:
+        print("{} schema for Athena is not available. Generating temp schema ...".format(resource)) 
+        import parameter
+        from schema_func import AWSbuildSchema
+        from annotation_func import buildBundle
+        resourceDefinitions = buildBundle(os.getcwd() + '/fhir/R4.0.1/profiles-resources.json')
+        typeDefinitions = buildBundle(os.getcwd() + '/fhir/R4.0.1/profiles-types.json')
+        definitions = {"definitions": {**resourceDefinitions['definitions'], **typeDefinitions['definitions']}, "resourceNames": resourceDefinitions['resourceNames']}
+        schema = AWSbuildSchema(resource, definitions['definitions'], parameter.config, '', {})
+        
+    return schema        
 
 
 #athena_delta_from_schema("patient", get_crawled_schema("patient"), "s3://schema-bintest2", 's3://s3-for-athena-bintest2/test', athena_db = "sampledb")

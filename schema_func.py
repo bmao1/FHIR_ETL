@@ -55,7 +55,7 @@ def AWSbuildSchema(basePath, definitions, config={}, fullPath='', recursionList=
 
 
             #include extension only is specified; remove extension in extesnsion; remove "skip" types
-            if path.startswith("Extension") and not any(x.find(fullPath) > -1 for x in config['includeExtensions']):
+            if path.startswith("Extension") and not any(x.find(elemFullPath) > -1 for x in config['includeExtensions']):
                 continue
             if 'inExtension' in config and config['inExtension']==True and definition['type'] =='Extension':
                 continue

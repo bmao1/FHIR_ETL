@@ -19,7 +19,7 @@ def main(args):
 
     try:
         print("received " + args[2])
-        new_tables = args[2].lower().split(',')
+        new_tables = args[2].split(',')
         print("Requested new table schema being created for {0}".format(new_tables))
     except:
         new_tables =[]
@@ -36,7 +36,7 @@ def main(args):
                 lineContent = json.loads(f.readline().rstrip())
                 resourcename = lineContent["resourceType"]
             files_to_delta(fname, s3lakepath + resourcename)
-            resourcename = resourcename.lower()
+            # resourcename = resourcename.lower()
             if resourcename not in updated_resource:
                 updated_resource += [resourcename]
         
