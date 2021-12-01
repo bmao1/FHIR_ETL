@@ -73,8 +73,8 @@ def sparkBuildSchema(basePath, definitions, config={}, fullPath='', recursionLis
             #include extension only is specified; remove extension in extesnsion; remove "skip" types
             if path.startswith("Extension") and not any(x.find(elemFullPath) > -1 for x in config['includeExtensions']):
                 continue
-            if 'inExtension' in config and config['inExtension']==True and definition['type'] =='Extension':
-                continue
+            #if 'inExtension' in config and config['inExtension']==True and definition['type'] =='Extension':
+            #    continue
             if definition['type'] in skip:
                 continue
 

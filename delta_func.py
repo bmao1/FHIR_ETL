@@ -42,6 +42,9 @@ spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.access.key", credentia
 spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.secret.key", credentials.secret_key)
 spark.sparkContext._jsc.hadoopConfiguration().set("fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem")
 
+# shuffle partition is setup to optimize merge performance in small scale local deploy, avoiding multiple small files by limit parallelism
+spark.conf.set("spark.sql.shuffle.partitions",1)
+
 sc = pyspark.SparkContext.getOrCreate()
 sc.setLogLevel("ERROR")
 
@@ -68,7 +71,7 @@ def ndjson_to_delta(filepath, deltapath):
 
     # will the data contains multiple version of the same resource?
     print("Reading file " + filepath)
-    updatesDF = spark.read.json(filepath,schema).dropDuplicates(["id"]).fillna("")
+    updatesDF = spark.read.json(filepath,schema).dropDuplicates(["id"])
     # try load delta table
     deltapath= deltapath.lower()
     try:
@@ -91,7 +94,8 @@ def ndjson_to_delta(filepath, deltapath):
         print("Merge took {:0.1f}s.".format(time()-ts))
     else:
         print("Creating new delta table in " + deltapath)
-        updatesDF.write.option("overwriteSchema", "true").format("delta").mode("overwrite").save(deltapath)
+        # repartition(1) is used to output single file, good for local delta deploy/test, w/o cluster setup
+        updatesDF.repartition(1).write.option("overwriteSchema", "true").format("delta").mode("overwrite").save(deltapath)
         print("New delta table is created")
 
     deltaTable = DeltaTable.forPath(spark, deltapath)
