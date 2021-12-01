@@ -1,6 +1,6 @@
 import sys
 import parameter
-from schema_func import AWSbuildSchema
+from sparkschema_func import sparkBuildSchema
 from annotation_func import buildBundle
 import os
 
@@ -21,9 +21,10 @@ def main(args):
 
 	for eachresource in resourceTypes:
 	    print("Generating schema for : {0}".format(eachresource))
-	    awsschema = AWSbuildSchema(eachresource, definitions['definitions'], parameter.config, '', {})
-	    with open(os.getcwd() + "/schema/" + eachresource.lower() +'.txt', 'w') as outfile:
-	        outfile.write(str(awsschema))
+	    schema = sparkBuildSchema(eachresource, definitions['definitions'], parameter.config, '', {})
+	    schema = "StructType([{}])".format(schema)
+	    with open(os.getcwd() + "/schema/delta_" + eachresource.lower() +'.txt', 'w') as outfile:
+	        outfile.write(str(schema))
 
 
 if __name__ == '__main__':

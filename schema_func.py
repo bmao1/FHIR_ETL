@@ -6,9 +6,32 @@
 
 from collections import OrderedDict
 from annotation_func import buildBundle
+import re
+
+def ext_flat_trim(str1):
+    str2=""
+    trim=0
+    for i in str1.split("."):
+        if i in ( "modifierExtension", "extension") and trim == 1:
+            continue
+        elif i in ( "modifierExtension", "extension"):
+            str2 += i + "."
+            trim = 1
+        else :
+            trim = 0
+            str2 += i + "."
+
+    str2 = re.sub(r'\.$', '', str2)
+    return str2
 
 def AWSbuildSchema(basePath, definitions, config={}, fullPath='', recursionList={}, colon= ' '):
-
+    if 'includeExtensions' in  config:
+        new_include_ext = []
+        for i in config['includeExtensions']:
+            i = ext_flat_trim(i)
+            new_include_ext += [i]
+        config['includeExtensions'] = new_include_ext
+        
     schema=''
     typeMapping = { 'boolean': "BOOLEAN", 'integer': "INT", 'decimal': "DOUBLE", 'unsignedInt': "INT", 'positiveInt': "INT",\
 		'fhirid': "STRING", 'string': "STRING", 'code': "STRING", 'uri': "STRING", 'url': "STRING", 'canonical': "STRING",\
@@ -54,11 +77,11 @@ def AWSbuildSchema(basePath, definitions, config={}, fullPath='', recursionList=
             definition = definitions[path]
 
 
-            #include extension only is specified; remove extension in extesnsion; remove "skip" types
-            if path.startswith("Extension") and not any(x.find(fullPath) > -1 for x in config['includeExtensions']):
+            #include extension only is specified; remove extension in extension; remove "skip" types
+            if path.startswith("Extension") and not any(x.find(elemFullPath) > -1 for x in config['includeExtensions']):
                 continue
-            if 'inExtension' in config and config['inExtension']==True and definition['type'] =='Extension':
-                continue
+            #if 'inExtension' in config and config['inExtension']==True and definition['type'] =='Extension':
+            #    continue
             if definition['type'] in skip:
                 continue
 
