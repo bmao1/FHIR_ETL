@@ -6,8 +6,31 @@
 
 from collections import OrderedDict
 from annotation_func import buildBundle
+import re
+
+def ext_flat_trim(str1):
+    str2=""
+    trim=0
+    for i in str1.split("."):
+        if i in ( "modifierExtension", "extension") and trim == 1:
+            continue
+        elif i in ( "modifierExtension", "extension"):
+            str2 += i + "."
+            trim = 1
+        else :
+            trim = 0
+            str2 += i + "."
+
+    str2 = re.sub(r'\.$', '', str2)
+    return str2
 
 def sparkBuildSchema(basePath, definitions, config={}, fullPath='', recursionList={}):
+    if 'includeExtensions' in  config:
+        new_include_ext = []
+        for i in config['includeExtensions']:
+            i = ext_flat_trim(i)
+            new_include_ext += [i]
+        config['includeExtensions'] = new_include_ext
 
     schema=''
     typeMapping = { 'boolean': "BooleanType()", 
