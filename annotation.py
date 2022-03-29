@@ -34,9 +34,7 @@ def main(args):
 
     for filename in glob(trimUrl(inputdir) + '/*.ndjson'):
         with open(filename) as f:
-            # resourcename = filename[:-7].split("/")[-1]
-            content = f.readlines()
-            for line in content:
+            for line in f:
                 lineContent = json.loads(line)
                 resourcename = lineContent["resourceType"]
                 if "contained" in lineContent:
