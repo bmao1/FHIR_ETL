@@ -26,6 +26,7 @@ Observation.modifierExtension.extension.valueCodeableConcept.text,keep,nlp_versi
 Observation.modifierExtension.extension.valueCodeableConcept,keep,nlp_version_and_info
 Observation.modifierExtension.extension.valueDate,keep,nlp_notes_date
 Observation.modifierExtension.extension.valueString,keep,nlp_version_and_info
+Observation.modifierExtension.valueString,keep,nlp_classifier
 Condition.code.extension.url,keep,nlp_text_position
 Condition.code.extension.extension.url,keep,nlp_text_position
 Condition.code.extension.extension.valueInteger,keep,nlp_text_position
@@ -57,8 +58,7 @@ nodesByType('Reference').reference,keep,keep_for_table_join
 nodesByType('date'),keep,temporal_analysis
 nodesByType('dateTime'),keep,temporal_analysis
 nodesByType('instant'),keep,temporal_analysis
-
-
+nodesByType('Age'),keep,temporal_analysis
 
 
 
