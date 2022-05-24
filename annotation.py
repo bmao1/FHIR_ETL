@@ -5,7 +5,7 @@ import json
 from annotation_func import *
 import parameter
 import os
-
+from datetime import datetime
 
 def main(args):
     if len(args) < 2:
@@ -34,10 +34,14 @@ def main(args):
 
     for filename in glob(trimUrl(inputdir) + '/*.ndjson'):
         with open(filename) as f:
-            # resourcename = filename[:-7].split("/")[-1]
-            content = f.readlines()
-            for line in content:
-                lineContent = json.loads(line)
+            for index, line in enumerate(f):
+                if index % 10000 == 0:
+                    print(str(index) + " completed, ", datetime.now())
+                try: 
+                    lineContent = json.loads(line)
+                except:
+                    continue
+                    
                 resourcename = lineContent["resourceType"]
                 if "contained" in lineContent:
                     for cont_res in lineContent["contained"]:
